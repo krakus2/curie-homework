@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { GlobalWorkerOptions, getDocument } from 'pdfjs-dist'
-import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist'
+import { type PDFDocumentProxy, type PDFPageProxy } from 'pdfjs-dist'
 import type { DocumentInitParameters } from 'pdfjs-dist/types/src/display/api'
 import { usePDFContext } from './context'
 
@@ -8,7 +7,9 @@ function isFunction(value: any): value is Function {
   return typeof value === 'function'
 }
 
-GlobalWorkerOptions.workerSrc = 'pdf.worker.min.mjs'
+let pdfjs: typeof import('pdfjs-dist') | null = null
+
+// GlobalWorkerOptions.workerSrc = 'pdf.worker.min.mjs'
 
 type PDFRenderTask = ReturnType<PDFPageProxy['render']>
 type TypedArray =
@@ -63,6 +64,16 @@ export const usePDF = ({
   onPageRenderFail,
   page = 1,
 }: UsePDFProps) => {
+  if (typeof window !== 'undefined') {
+    // Import PDF.js...
+    import('pdfjs-dist').then((pdfjsObject) => {
+      pdfjs = pdfjsObject
+
+      // Set the worker source...
+      pdfjs.GlobalWorkerOptions.workerSrc = 'pdf.worker.min.mjs'
+    })
+  }
+
   const { pdfDocument, setPdfDocument, setPdfPage } = usePDFContext()
 
   const renderTask = useRef<PDFRenderTask | null>(null)
@@ -100,11 +111,11 @@ export const usePDF = ({
   }, [onPageRenderFail])
 
   useEffect(() => {
-    if (!file) return
+    if (!pdfjs || !file) return
 
     const config: DocumentInitParameters = { data: file }
 
-    getDocument(config).promise.then(
+    pdfjs.getDocument(config).promise.then(
       (loadedPdfDocument) => {
         setPdfDocument(loadedPdfDocument)
 
@@ -118,7 +129,7 @@ export const usePDF = ({
         }
       }
     )
-  }, [file])
+  }, [pdfjs, file])
 
   useEffect(() => {
     // draw a page of the pdf

@@ -10,7 +10,7 @@ import {
   Group,
 } from '@mantine/core'
 import * as pdfjsLib from 'pdfjs-lib'
-import { TextItem } from 'pdfjs-dist/types/src/display/api'
+import { type TextItem } from 'pdfjs-dist/types/src/display/api'
 import { PDFProvider, PDFViewer, usePDFContext, type WordBox } from './libs/PDF'
 
 const ViewerWithUpload = () => {
