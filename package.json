@@ -7,12 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "copy-pdf-worker": "cp ./node_modules/pdfjs-dist/build/pdf.worker.min.mjs ./public/"
+    "copy-pdf-worker": "cp ./node_modules/pdfjs-dist/build/pdf.worker.mjs ./public/"
   },
   "dependencies": {
     "@mantine/core": "^8.1.1",
     "@mantine/hooks": "^8.1.1",
-    "canvas": "^3.1.1",
+    "canvas": "2.11.2",
     "next": "15.3.4",
     "pdfjs-dist": "^5.3.31",
     "pdfjs-lib": "^0.0.149",
@@ -30,5 +30,10 @@
     "postcss-preset-mantine": "^1.17.0",
     "postcss-simple-vars": "^7.0.1",
     "typescript": "^5"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "pdfjs-dist@5.3.31": "patches/pdfjs-dist@5.3.31.patch"
+    }
   }
 }

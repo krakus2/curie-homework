@@ -1,0 +1,26 @@
+diff --git a/build/pdf.worker.mjs b/build/pdf.worker.mjs
+index cde95ea4e96b06c55e28db7e5c84bcf11f73e177..8dde1d33403894c63b9481f54af9c518c587f304 100644
+--- a/build/pdf.worker.mjs
++++ b/build/pdf.worker.mjs
+@@ -32846,6 +32846,7 @@ class PartialEvaluator {
+       textContentItem.spaceInFlowMin = fontSize * SPACE_IN_FLOW_MIN_FACTOR;
+       textContentItem.spaceInFlowMax = fontSize * SPACE_IN_FLOW_MAX_FACTOR;
+       textContentItem.hasEOL = false;
++      textContentItem.chars = [];
+       textContentItem.initialized = true;
+       return textContentItem;
+     }
+@@ -33108,6 +33109,13 @@ class PartialEvaluator {
+             textState.translateTextMatrix(0, -charSpacing);
+           }
+         }
++        
++        textChunk.chars.push({
++          char: glyph.fontChar,
++          width: scaledDim,
++          unicode: glyph.unicode,
++          transform: textChunk.prevTransform,
++        });
+       }
+     }
+     function appendEOL() {

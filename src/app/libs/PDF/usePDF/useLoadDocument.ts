@@ -26,7 +26,7 @@ export const useLoadDocument = ({
     import('pdfjs-dist').then((pdfjsObject) => {
       pdfjs = pdfjsObject
 
-      pdfjs.GlobalWorkerOptions.workerSrc = 'pdf.worker.min.mjs'
+      pdfjs.GlobalWorkerOptions.workerSrc = 'pdf.worker.mjs'
     })
   }
 
