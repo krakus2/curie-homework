@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { GlobalWorkerOptions, getDocument } from 'pdfjs-dist'
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist'
 import type { DocumentInitParameters } from 'pdfjs-dist/types/src/display/api'
+import { usePDFContext } from './context'
 
 function isFunction(value: any): value is Function {
   return typeof value === 'function'
@@ -33,11 +34,24 @@ export type UsePDFProps = {
   onPageRenderFail?: () => void
 }
 
-type ReturnValues = {
-  pdfDocument: PDFDocumentProxy | undefined
-  pdfPage: PDFPageProxy | undefined
+// type ReturnValues = {
+//   pdfDocument: PDFDocumentProxy | undefined
+//   pdfPage: PDFPageProxy | undefined
+// }
+
+export type BBox = {
+  left: number
+  top: number
+  width: number
+  height: number
 }
 
+export type WordBox = {
+  str: string
+  bbox: BBox
+}
+
+// TODO: Rework promises to async/await
 export const usePDF = ({
   canvasRef,
   file,
@@ -48,9 +62,9 @@ export const usePDF = ({
   onPageRenderSuccess,
   onPageRenderFail,
   page = 1,
-}: UsePDFProps): ReturnValues => {
-  const [pdfDocument, setPdfDocument] = useState<PDFDocumentProxy>()
-  const [pdfPage, setPdfPage] = useState<PDFPageProxy>()
+}: UsePDFProps) => {
+  const { pdfDocument, setPdfDocument, setPdfPage } = usePDFContext()
+
   const renderTask = useRef<PDFRenderTask | null>(null)
   const lastPageRequestedRenderRef = useRef<PDFPageProxy | null>(null)
   const onDocumentLoadSuccessRef = useRef(onDocumentLoadSuccess)
@@ -109,7 +123,7 @@ export const usePDF = ({
   useEffect(() => {
     // draw a page of the pdf
     const drawPDF = (page: PDFPageProxy) => {
-      const viewport = page.getViewport({ scale: 1 })
+      const viewport = page.getViewport({ scale: 1.5 })
       const canvasEl = canvasRef!.current
       if (!canvasEl) {
         return
@@ -138,7 +152,7 @@ export const usePDF = ({
       })
 
       return renderTask.current.promise.then(
-        () => {
+        async () => {
           renderTask.current = null
 
           if (isFunction(onPageRenderSuccessRef.current)) {
@@ -179,6 +193,4 @@ export const usePDF = ({
       )
     }
   }, [canvasRef, page, pdfDocument])
-
-  return { pdfDocument, pdfPage }
 }
