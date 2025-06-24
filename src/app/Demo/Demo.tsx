@@ -11,6 +11,7 @@ import {
 } from '@mantine/core'
 import { PDFProvider, PDFViewer } from '../libs/PDF'
 import { usePhrases } from './usePhrases'
+import { PhraseHighlight } from './PhraseHighlight'
 
 const ViewerWithUpload = () => {
   const [file, setFile] = useState<Uint8Array | null>(null)
@@ -86,21 +87,7 @@ const ViewerWithUpload = () => {
             }}
           >
             {phrases.length > 0 && currentIndex < phrases.length && (
-              <div
-                style={{
-                  position: 'absolute',
-                  borderRadius: 4,
-                  backgroundColor: 'rgba(255, 165, 0, 0.6)',
-                  border: '2px solid orange',
-                  left: `${phrases[currentIndex].bbox.left - 4}px`,
-                  top: `${phrases[currentIndex].bbox.top - 2}px`,
-                  width: `${phrases[currentIndex].bbox.width + 8}px`,
-                  height: `${phrases[currentIndex].bbox.height + 4}px`,
-                  pointerEvents: 'none',
-                  transition: 'all 0.2s ease-in-out',
-                  zIndex: 10,
-                }}
-              />
+              <PhraseHighlight bbox={phrases[currentIndex].bbox} />
             )}
           </div>
         </PDFViewer>
