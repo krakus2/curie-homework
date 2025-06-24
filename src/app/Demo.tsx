@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
+import { FileInput } from '@mantine/core'
+import { Stack } from '@mantine/core'
 import { PDFViewer } from './libs/PDF'
 
 export const Demo = () => {
   const [file, setFile] = useState<Uint8Array | null>(null)
 
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+  const handleFile = (file: File | null) => {
     if (!file) return
     const reader = new FileReader()
     reader.onload = () => setFile(new Uint8Array(reader.result as ArrayBuffer))
@@ -15,9 +16,13 @@ export const Demo = () => {
   }
 
   return (
-    <div>
-      <input type='file' onChange={handleFile} accept='application/pdf' />
+    <Stack align='center'>
+      <FileInput
+        label='Choose your PDF'
+        onChange={handleFile}
+        accept='application/pdf'
+      />
       <PDFViewer file={file} />
-    </div>
+    </Stack>
   )
 }

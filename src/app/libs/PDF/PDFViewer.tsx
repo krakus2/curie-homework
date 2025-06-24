@@ -22,10 +22,7 @@ export const PDFViewer = ({ file }: PDFViewerProps) => {
   return (
     <div>
       {isDocumentLoading && <span>Loading...</span>}
-      <canvas
-        ref={canvasRef}
-        style={{ border: '1px solid #ccc', display: 'block' }}
-      />
+      <canvas ref={canvasRef} style={{ display: 'block' }} />
     </div>
   )
 }
