@@ -1,6 +1,8 @@
-import { useEffect } from 'react'
-import type { DocumentInitParameters } from 'pdfjs-dist/types/src/display/api'
+import { useEffect, type RefObject } from 'react'
+import { type DocumentInitParameters } from 'pdfjs-dist/types/src/display/api'
+import { type PDFDocumentProxy } from 'pdfjs-dist'
 import { usePDFContext } from '../context'
+import { type UsePDFProps } from './usePDF'
 
 function isFunction(value: any): value is Function {
   return typeof value === 'function'
@@ -8,11 +10,18 @@ function isFunction(value: any): value is Function {
 
 let pdfjs: typeof import('pdfjs-dist') | null = null
 
+type UseLoadDocumentProps = Pick<UsePDFProps, 'file'> & {
+  onDocumentLoadSuccessRef: RefObject<
+    ((document: PDFDocumentProxy) => void) | undefined
+  >
+  onDocumentLoadFailRef: RefObject<(() => void) | undefined>
+}
+
 export const useLoadDocument = ({
   file,
   onDocumentLoadSuccessRef,
   onDocumentLoadFailRef,
-}: any) => {
+}: UseLoadDocumentProps) => {
   if (typeof window !== 'undefined') {
     import('pdfjs-dist').then((pdfjsObject) => {
       pdfjs = pdfjsObject

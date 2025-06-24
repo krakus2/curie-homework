@@ -1,6 +1,5 @@
 import { useRef } from 'react'
 import { type PDFDocumentProxy, type PDFPageProxy } from 'pdfjs-dist'
-import { usePDFContext } from '../context'
 import { useLoadDocument } from './useLoadDocument'
 import { useLoadPage } from './useLoadPage'
 import { useStableCallbacks } from './useStableCallbacks'
@@ -52,8 +51,6 @@ export const usePDF = ({
   onPageRenderFail,
   page = 1,
 }: UsePDFProps) => {
-  const { setPdfDocument } = usePDFContext()
-
   const renderTask = useRef<PDFRenderTask | null>(null)
   const lastPageRequestedRenderRef = useRef<PDFPageProxy | null>(null)
 
@@ -75,7 +72,6 @@ export const usePDF = ({
 
   useLoadDocument({
     file,
-    setPdfDocument,
     onDocumentLoadSuccessRef,
     onDocumentLoadFailRef,
   })

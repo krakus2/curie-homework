@@ -1,21 +1,32 @@
-import { useEffect } from 'react'
-import { type PDFPageProxy } from 'pdfjs-dist'
+import { useEffect, type RefObject } from 'react'
+import { type RenderTask, type PDFPageProxy } from 'pdfjs-dist'
 import { usePDFContext } from '../context'
+import { type UsePDFProps } from './usePDF'
 
 function isFunction(value: any): value is Function {
   return typeof value === 'function'
 }
 
+type UseLoadPageProps = Pick<UsePDFProps, 'canvasRef'> & {
+  page: number
+  onPageRenderSuccessRef: RefObject<((page: PDFPageProxy) => void) | undefined>
+  onPageRenderFailRef: RefObject<(() => void) | undefined>
+  onPageLoadSuccessRef: RefObject<((page: PDFPageProxy) => void) | undefined>
+  onPageLoadFailRef: RefObject<(() => void) | undefined>
+  renderTask: RefObject<RenderTask | null>
+  lastPageRequestedRenderRef: RefObject<PDFPageProxy | null>
+}
+
 export const useLoadPage = ({
+  canvasRef,
   renderTask,
   page,
-  canvasRef,
   lastPageRequestedRenderRef,
   onPageRenderSuccessRef,
   onPageRenderFailRef,
   onPageLoadSuccessRef,
   onPageLoadFailRef,
-}: any) => {
+}: UseLoadPageProps) => {
   const { pdfDocument, setPdfPage } = usePDFContext()
 
   useEffect(() => {
