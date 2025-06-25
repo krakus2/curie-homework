@@ -29,8 +29,6 @@ const ViewerWithUpload = () => {
 
   const highlights = mode === 'phrase' ? phrases : words
 
-  console.log({ words })
-
   const handleFile = (file: File | null) => {
     if (!file) return
 
@@ -41,18 +39,18 @@ const ViewerWithUpload = () => {
     reader.readAsArrayBuffer(file)
   }
 
-  const isNextPhraseAvailable = currentIndex < words.length - 1
-  const isPrevPhraseAvailable = currentIndex > 0
+  const isNextHighlightAvailable = currentIndex < highlights.length - 1
+  const isPrevHighlightAvailable = currentIndex > 0
   const isModeCheckboxDisabled = !file
 
-  const handleNextPhrase = () => {
-    if (isNextPhraseAvailable) {
+  const handleNextHighlight = () => {
+    if (isNextHighlightAvailable) {
       setCurrentIndex(currentIndex + 1)
     }
   }
 
-  const handlePrevPhrase = () => {
-    if (isPrevPhraseAvailable) {
+  const handlePrevHighlight = () => {
+    if (isPrevHighlightAvailable) {
       setCurrentIndex(currentIndex - 1)
     }
   }
@@ -91,15 +89,15 @@ const ViewerWithUpload = () => {
         </Radio.Group>
         <Group mt='md'>
           <Button
-            disabled={!isPrevPhraseAvailable}
-            onClick={handlePrevPhrase}
+            disabled={!isPrevHighlightAvailable}
+            onClick={handlePrevHighlight}
             color='gray'
           >
             Previous
           </Button>
           <Button
-            disabled={!isNextPhraseAvailable}
-            onClick={handleNextPhrase}
+            disabled={!isNextHighlightAvailable}
+            onClick={handleNextHighlight}
             color='blue'
           >
             Next
@@ -121,7 +119,7 @@ const ViewerWithUpload = () => {
               pointerEvents: 'none',
             }}
           >
-            {highlights.length > 0 && currentIndex < highlights.length && (
+            {highlights.length > 0 && (
               <PhraseHighlight bbox={highlights[currentIndex].bbox} />
             )}
           </div>
