@@ -3,10 +3,10 @@
 import { useEffect, useState } from 'react'
 import * as pdfjsLib from 'pdfjs-lib'
 import { type TextItem } from 'pdfjs-dist/types/src/display/api'
-import { usePDFContext, type WordBox } from '../libs/PDF'
+import { usePDFContext, type HighlightBox } from '../libs/PDF'
 
 export const usePhrases = () => {
-  const [phrases, setPhrases] = useState<WordBox[]>([])
+  const [phrases, setPhrases] = useState<HighlightBox[]>([])
 
   const { pdfPage } = usePDFContext()
 
@@ -17,7 +17,7 @@ export const usePhrases = () => {
       const viewport = pdfPage.getViewport({ scale: 1.5 })
       const textContent = await pdfPage.getTextContent()
 
-      const wordBoxes: WordBox[] = []
+      const highlightBoxes: HighlightBox[] = []
 
       for (const item of textContent.items) {
         const textItem = item as TextItem
@@ -29,8 +29,8 @@ export const usePhrases = () => {
 
         // INFO: Transform item to viewport coordinates
         const transform = pdfjsLib.Util.transform(
-          viewport.transform,
-          textItem.transform
+          pdfjsLib.Util.transform(viewport.transform, textItem.transform),
+          [1, 0, 0, -1, 0, 0]
         ) as number[]
 
         const x = transform[4]
@@ -38,7 +38,7 @@ export const usePhrases = () => {
         const width = textItem.width * viewport.scale
         const height = textItem.height * viewport.scale
 
-        wordBoxes.push({
+        highlightBoxes.push({
           str: textItem.str,
           bbox: {
             left: x,
@@ -50,7 +50,7 @@ export const usePhrases = () => {
         })
       }
 
-      setPhrases(wordBoxes)
+      setPhrases(highlightBoxes)
     }
 
     void processPdf()

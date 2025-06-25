@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import * as pdfjsLib from 'pdfjs-lib'
 import { type TextItem } from 'pdfjs-dist/types/src/display/api'
-import { usePDFContext, type WordBox } from '../libs/PDF'
+import { usePDFContext, type HighlightBox } from '../libs/PDF'
 
 type TextItemWithCharsCoordinates = TextItem & {
   chars: Array<{
@@ -15,7 +15,7 @@ type TextItemWithCharsCoordinates = TextItem & {
 }
 
 export const useWords = () => {
-  const [words, setWords] = useState<WordBox[]>([])
+  const [words, setWords] = useState<HighlightBox[]>([])
   const { pdfPage } = usePDFContext()
 
   useEffect(() => {
@@ -25,16 +25,16 @@ export const useWords = () => {
       const viewport = pdfPage.getViewport({ scale: 1.5 })
       const textContent = await pdfPage.getTextContent()
 
-      const wordBoxes: WordBox[] = []
+      const highlightBoxes: HighlightBox[] = []
 
       for (const item of textContent.items) {
+        console.log({ item })
         const textItem = item as TextItemWithCharsCoordinates
 
         if (!textItem.str || !textItem.chars || textItem.chars.length === 0) {
           continue
         }
 
-        // Split full string into words
         const wordsInString = textItem.str.split(/\s+/)
 
         let charIndex = 0
@@ -45,7 +45,7 @@ export const useWords = () => {
           const startCharIndex = charIndex
           let charsUsed = 0
 
-          // Try to match characters in `chars` with current word length
+          // INFO: Try to match characters in `chars` with current word length
           while (charIndex < textItem.chars.length && charsUsed < word.length) {
             charsUsed += textItem.chars[charIndex].unicode.length
             charIndex++
@@ -55,36 +55,39 @@ export const useWords = () => {
           if (wordChars.length === 0) continue
 
           const transformed = wordChars.map((char) => {
-            const [a, b, c, d, e, f] = pdfjsLib.Util.transform(
+            const transform = pdfjsLib.Util.transform(
               viewport.transform,
               char.transform
             )
+
+            // TODO: For some reason that value is skewed; check worker patch
+            const x = transform[4]
+            const y = transform[5]
             return {
-              x: e,
-              y: f,
-              width: char.width * viewport.scale,
-              height: d * viewport.scale,
+              left: x,
+              right: x + char.width * viewport.scale,
+              bottom: y,
             }
           })
 
-          const minX = Math.min(...transformed.map((t) => t.x))
-          const maxX = Math.max(...transformed.map((t) => t.x + t.width))
-          const minY = Math.min(...transformed.map((t) => t.y - t.height))
-          const maxY = Math.max(...transformed.map((t) => t.y))
+          const minX = Math.min(...transformed.map((t) => t.left))
+          const maxX = Math.max(...transformed.map((t) => t.right))
+          const minY = Math.min(...transformed.map((t) => t.bottom))
 
-          wordBoxes.push({
+          highlightBoxes.push({
             str: word,
             bbox: {
               left: minX,
-              top: minY,
+              // TODO: Magic number, to be determined why we need it
+              top: minY - 16,
               width: maxX - minX,
-              height: (maxY - minY) * -1, // Flip height if needed
+              height: textItem.height * viewport.scale,
             },
           })
         }
       }
 
-      setWords(wordBoxes)
+      setWords(highlightBoxes)
     }
 
     void processPdf()

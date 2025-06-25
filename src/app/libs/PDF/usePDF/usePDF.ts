@@ -35,7 +35,7 @@ export type BBox = {
   height: number
 }
 
-export type WordBox = {
+export type HighlightBox = {
   str: string
   bbox: BBox
 }
