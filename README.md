@@ -34,5 +34,5 @@ This is a Next.js app with `pdfjs-dist` integration that highlights PDF text:
 
 ## How to start the app?
 
-pnpm install
-pnpm run dev
+- pnpm install
+- pnpm run dev
