@@ -38,8 +38,6 @@ export const usePhrases = () => {
         const width = textItem.width * viewport.scale
         const height = textItem.height * viewport.scale
 
-        console.log({ str: textItem })
-
         wordBoxes.push({
           str: textItem.str,
           bbox: {

@@ -42666,8 +42666,6 @@ class PartialEvaluator {
           }
         }
 
-        console.log(textChunk)
-
         textChunk.chars.push({
           char: glyph.fontChar,
           width: scaledDim,

@@ -8,18 +8,28 @@ import {
   useMantineTheme,
   Button,
   Group,
+  Radio,
 } from '@mantine/core'
 import { PDFProvider, PDFViewer } from '../libs/PDF'
 import { usePhrases } from './usePhrases'
 import { PhraseHighlight } from './PhraseHighlight'
+import { useWords } from './useWords'
+
+type Mode = 'phrase' | 'word'
 
 const ViewerWithUpload = () => {
   const [file, setFile] = useState<Uint8Array | null>(null)
+  const [mode, setMode] = useState<Mode>('phrase')
   const [currentIndex, setCurrentIndex] = useState(0)
 
   const theme = useMantineTheme()
 
   const { phrases } = usePhrases()
+  const { words } = useWords()
+
+  const highlights = mode === 'phrase' ? phrases : words
+
+  console.log({ words })
 
   const handleFile = (file: File | null) => {
     if (!file) return
@@ -31,8 +41,9 @@ const ViewerWithUpload = () => {
     reader.readAsArrayBuffer(file)
   }
 
-  const isNextPhraseAvailable = currentIndex < phrases.length - 1
+  const isNextPhraseAvailable = currentIndex < words.length - 1
   const isPrevPhraseAvailable = currentIndex > 0
+  const isModeCheckboxDisabled = !file
 
   const handleNextPhrase = () => {
     if (isNextPhraseAvailable) {
@@ -46,6 +57,11 @@ const ViewerWithUpload = () => {
     }
   }
 
+  const handleModeChange = (value: string) => {
+    setMode(value as Mode)
+    setCurrentIndex(0)
+  }
+
   return (
     <Flex mih='100vh' justify='center'>
       <Box flex='2 0 20%' bg={theme.colors.blue[1]} p='20px'>
@@ -54,6 +70,25 @@ const ViewerWithUpload = () => {
           onChange={handleFile}
           accept='application/pdf'
         />
+        <Radio.Group
+          value={mode}
+          onChange={handleModeChange}
+          name='mode'
+          label='Select highlight mode'
+        >
+          <Group mt='xs' gap='10px'>
+            <Radio
+              value='phrase'
+              label='Phrase'
+              disabled={isModeCheckboxDisabled}
+            />
+            <Radio
+              value='word'
+              label='Word'
+              disabled={isModeCheckboxDisabled}
+            />
+          </Group>
+        </Radio.Group>
         <Group mt='md'>
           <Button
             disabled={!isPrevPhraseAvailable}
@@ -86,8 +121,8 @@ const ViewerWithUpload = () => {
               pointerEvents: 'none',
             }}
           >
-            {phrases.length > 0 && currentIndex < phrases.length && (
-              <PhraseHighlight bbox={phrases[currentIndex].bbox} />
+            {highlights.length > 0 && currentIndex < highlights.length && (
+              <PhraseHighlight bbox={highlights[currentIndex].bbox} />
             )}
           </div>
         </PDFViewer>
